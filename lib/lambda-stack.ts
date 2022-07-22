@@ -1,20 +1,16 @@
-import * as cdk from 'aws-cdk-lib';
+import { IResource, LambdaIntegration, MockIntegration, PassthroughBehavior, RestApi } from 'aws-cdk-lib/aws-apigateway';
+import { AttributeType, StreamViewType, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { Runtime,StartingPosition } from 'aws-cdk-lib/aws-lambda';
+import { RemovalPolicy, CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
+import { NodejsFunction, NodejsFunctionProps } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { join } from 'path'
 import { Construct } from 'constructs';
-import { Function, InlineCode, Runtime, Code} from 'aws-cdk-lib/aws-lambda';
-import * as path from 'path';
-import { Table, AttributeType } from 'aws-cdk-lib/aws-dynamodb';
-import { RemovalPolicy } from 'aws-cdk-lib';
+import { DynamoEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
+import * as iam from "aws-cdk-lib/aws-iam";
 
-export class MyLambdaStack extends cdk.Stack {
-    constructor(scope: Construct, id: string, stageName: string, props?: cdk.StackProps) {
+export class MyLambdaStack extends Stack {
+    constructor(scope: Construct, id: string, stageName: string, props?: StackProps) {
       super(scope, id, props);
-      new Function(this, 'LambdaFunction', {
-        runtime: Runtime.NODEJS_12_X, //using node for this, but can easily use python or other
-        handler: 'handler.handler',
-        code: Code.fromAsset(path.join(__dirname, 'lambda')), //resolving to ./lambda directory
-        environment: { "stageName": stageName } //inputting stagename
-      });
-
       const CarrosTable = new Table (this, 'carros', {
         tableName:'carros',
         partitionKey:{
@@ -25,11 +21,130 @@ export class MyLambdaStack extends cdk.Stack {
             name:'modelo',
             type:AttributeType.STRING
         },
+        stream: StreamViewType.NEW_AND_OLD_IMAGES,
         removalPolicy:RemovalPolicy.DESTROY
       })
 
+      const nodeJsFunctionProps: NodejsFunctionProps = {
+        bundling: {
+          externalModules: [
+            'aws-sdk', 
+          ],
+        },
+        depsLockFilePath: join(__dirname, '../', 'package-lock.json'),
+        environment: {
+          PRIMARY_KEY: 'id',
+          TABLE_NAME: CarrosTable.tableName
+        },
+        runtime: Runtime.NODEJS_14_X,
+      }
+    // Create a Lambda function for each of the CRUD operations
+    const getOneLambda = new NodejsFunction(this, 'getOneItemFunction', {
+      entry: join(__dirname, '../lambdas', 'get-one.ts'),
+      functionName:'getOneItemFunction',
+      ...nodeJsFunctionProps,
+    });
+    const getAllLambda = new NodejsFunction(this, 'getAllItemsFunction', {
+      entry: join(__dirname, '../lambdas', 'get-all.ts'),
+      functionName:'getAllItemsFunction',
+      ...nodeJsFunctionProps,
+    });
+    const createOneLambda = new NodejsFunction(this, 'createItemFunction', {
+      entry: join(__dirname, '../lambdas', 'create.ts'),
+      functionName:'createItemFunction',
+      ...nodeJsFunctionProps,
+    });
+    const updateOneLambda = new NodejsFunction(this, 'updateItemFunction', {
+      entry: join(__dirname, '../lambdas', 'update-one.ts'),
+      functionName:'updateItemFunction',
+      ...nodeJsFunctionProps,
+    });
+    const deleteOneLambda = new NodejsFunction(this, 'deleteItemFunction', {
+      entry: join(__dirname, '../lambdas', 'delete-one.ts'),
+      functionName:'deleteItemFunction',
+      ...nodeJsFunctionProps,
+    });
 
-    }
+    const notificationsLambda = new NodejsFunction(this, 'notificationsFunction', {
+      entry: join(__dirname, '../lambdas', 'notification.ts'),
+      functionName:'notificationsFunction',
+      ...nodeJsFunctionProps,
+    });
+
+
+    // Grant the Lambda function read access to the DynamoDB table
+    CarrosTable.grantReadWriteData(getAllLambda);
+    CarrosTable.grantReadWriteData(getOneLambda);
+    CarrosTable.grantReadWriteData(createOneLambda);
+    CarrosTable.grantReadWriteData(updateOneLambda);
+    CarrosTable.grantReadWriteData(deleteOneLambda);
+
+    notificationsLambda.addEventSource(new DynamoEventSource(CarrosTable, {
+      startingPosition:StartingPosition.TRIM_HORIZON,
+      batchSize: 1,
+    }));
+    notificationsLambda.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ["ses:SendEmail"],
+        resources: ["*"],
+      })
+    );
+
+    //Outputs
+    new CfnOutput(this, 'DynamoDBTable', {value:CarrosTable.tableName});
+    new CfnOutput(this, 'LambdaFunctionArn', {value:notificationsLambda.functionArn});
+
     
-    
+    // Integrate the Lambda functions with the API Gateway resource
+    const getAllIntegration = new LambdaIntegration(getAllLambda);
+    const createOneIntegration = new LambdaIntegration(createOneLambda);
+    const getOneIntegration = new LambdaIntegration(getOneLambda);
+    const updateOneIntegration = new LambdaIntegration(updateOneLambda);
+    const deleteOneIntegration = new LambdaIntegration(deleteOneLambda);
+
+
+    // Create an API Gateway resource for each of the CRUD operations
+    const api = new RestApi(this, 'itemsApi', {
+      restApiName: 'Items Service',
+    });
+
+    const items = api.root.addResource('items');
+    items.addMethod('GET', getAllIntegration);
+    items.addMethod('POST', createOneIntegration);
+    addCorsOptions(items);
+
+    const singleItem = items.addResource('{id}');
+    singleItem.addMethod('GET', getOneIntegration);
+    singleItem.addMethod('PATCH', updateOneIntegration);
+    singleItem.addMethod('DELETE', deleteOneIntegration);
+    addCorsOptions(singleItem);
+  }
+}
+export function addCorsOptions(apiResource: IResource) {
+  apiResource.addMethod('OPTIONS', new MockIntegration({
+    integrationResponses: [{
+      statusCode: '200',
+      responseParameters: {
+        'method.response.header.Access-Control-Allow-Headers': "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+        'method.response.header.Access-Control-Allow-Origin': "'*'",
+        'method.response.header.Access-Control-Allow-Credentials': "'false'",
+        'method.response.header.Access-Control-Allow-Methods': "'OPTIONS,GET,PUT,POST,DELETE'",
+      },
+    }],
+    passthroughBehavior: PassthroughBehavior.NEVER,
+    requestTemplates: {
+      "application/json": "{\"statusCode\": 200}"
+    },
+  }), {
+    methodResponses: [{
+      statusCode: '200',
+      responseParameters: {
+        'method.response.header.Access-Control-Allow-Headers': true,
+        'method.response.header.Access-Control-Allow-Methods': true,
+        'method.response.header.Access-Control-Allow-Credentials': true,
+        'method.response.header.Access-Control-Allow-Origin': true,
+      },
+    }]
+  })
+
 }
