@@ -17,13 +17,13 @@ export class CdkcarsStack extends Stack {
         }),
       });
 
-      const testingStage = pipeline.addStage(new MyPipelineAppStage(this, "test", {
+      const testingStage = pipeline.addStage(new MyPipelineAppStage(this, "dev", {
         env: { account: "591039258532", region: "us-east-2" }
       }));
   
   
-      testingStage.addPre(new ShellStep("Run Unit Tests", { commands: ['npm install', 'npm test'] }));
-      testingStage.addPost(new ManualApprovalStep('Manual approval before production'));
+      // testingStage.addPre(new ShellStep("Run Unit Tests", { commands: ['npm install', 'npm test'] }));
+      // testingStage.addPost(new ManualApprovalStep('Manual approval before production'));
   
       const prodStage = pipeline.addStage(new MyPipelineAppStage(this, "prod", {
         env: { account: "591039258532", region: "us-east-2" }
