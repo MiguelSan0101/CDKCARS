@@ -41,33 +41,33 @@ export class MyLambdaStack extends Stack {
     // Create a Lambda function for each of the CRUD operations
     const getOneLambda = new NodejsFunction(this, 'getOneItemFunction', {
       entry: join(__dirname, '../lambdas', 'get-one.ts'),
-      functionName:`getOneItemFunction - ${stageName}`,
+      functionName:`getOneItemFunction`,
       ...nodeJsFunctionProps,
     });
     const getAllLambda = new NodejsFunction(this, 'getAllItemsFunction', {
       entry: join(__dirname, '../lambdas', 'get-all.ts'),
-      functionName:`getAllItemsFunction - ${stageName}`,
+      functionName:`getAllItemsFunction`,
       ...nodeJsFunctionProps,
     });
     const createOneLambda = new NodejsFunction(this, 'createItemFunction', {
       entry: join(__dirname, '../lambdas', 'create.ts'),
-      functionName:`createItemFunction - ${stageName}`,
+      functionName:`createItemFunction`,
       ...nodeJsFunctionProps,
     });
     const updateOneLambda = new NodejsFunction(this, 'updateItemFunction', {
       entry: join(__dirname, '../lambdas', 'update-one.ts'),
-      functionName:`updateItemFunction - ${stageName}`,
+      functionName:`updateItemFunction`,
       ...nodeJsFunctionProps,
     });
     const deleteOneLambda = new NodejsFunction(this, 'deleteItemFunction', {
       entry: join(__dirname, '../lambdas', 'delete-one.ts'),
-      functionName:`deleteItemFunction - ${stageName}`,
+      functionName:`deleteItemFunction`,
       ...nodeJsFunctionProps,
     });
 
     const notificationsLambda = new NodejsFunction(this, 'notificationsFunction', {
       entry: join(__dirname, '../lambdas', 'notification.ts'),
-      functionName:`notificationsFunction - ${stageName}`,
+      functionName:`notificationsFunction`,
       ...nodeJsFunctionProps,
     });
 
