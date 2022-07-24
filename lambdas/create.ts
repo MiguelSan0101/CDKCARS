@@ -20,7 +20,7 @@ export const handler = async (event: any = {}): Promise<any> => {
     
   const {modelo, marca, ...resto } = JSON.parse(event.body);
 
-  item['id'] = uuidv4();
+  item[PRIMARY_KEY] = uuidv4();
   item['created_at'] = new Date().toString();
   const params = {
     TableName: TABLE_NAME,
@@ -28,6 +28,7 @@ export const handler = async (event: any = {}): Promise<any> => {
     ConditionExpression: 'attribute_not_exists(modelo)'
   };
   try {
+
 
     if(modelo === undefined || modelo === ''){
       return{statusCode: 500, body: `El modelo es requerido`};
@@ -37,7 +38,7 @@ export const handler = async (event: any = {}): Promise<any> => {
     }
     
   await db.put(params).promise();
-  return { statusCode: 201, body: `Exito al crear item\n`+JSON.stringify(params.Item)};
+  return { statusCode: 201, body: `Exito al crear item \n`+JSON.stringify(params.Item)};
       
 
   } catch (error) {
