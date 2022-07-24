@@ -18,7 +18,7 @@ export const handler = async (event: any = {}): Promise<any> => {
   }
   const item = typeof event.body == 'object' ? event.body : JSON.parse(event.body);
     
-  const {modelo} = JSON.parse(event.body);
+  const {modelo, marca, ...resto } = JSON.parse(event.body);
 
   item[PRIMARY_KEY] = uuidv4();
   item['created_at'] = new Date().toString();
@@ -28,18 +28,18 @@ export const handler = async (event: any = {}): Promise<any> => {
     ConditionExpression: 'attribute_not_exists(modelo)'
   };
   try {
-    
-    const params2={
-      TableName: 'modelos',
-      Item: {
-        modelo:modelo
-      },
-      
-    }
-      await db.put(params).promise();
-      return { statusCode: 201, body: 'Exito al crear item\n'+JSON.stringify(params.Item)};
 
+    if(modelo === undefined){
+      return{statusCode: 500, body: `El modelo es requerido`};
+    }
+    if(marca === undefined){
+      return{statusCode: 500, body: `La marca es requerida`};
+    }
     
+  await db.put(params).promise();
+  return { statusCode: 201, body: 'Exito al crear item\n'+JSON.stringify(params.Item)};
+      
+
   } catch (error) {
     const errorResponse = error === 'ValidationException' && error.includes('reserved keyword') ?
       DYNAMODB_EXECUTION_ERROR : RESERVED_RESPONSE;
