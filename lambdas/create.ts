@@ -27,17 +27,31 @@ export const handler = async (event: any = {}): Promise<any> => {
     Item: item,
     ConditionExpression: 'attribute_not_exists(modelo)'
   };
+  const p = {
+    IndexName: PRIMARY_KEY,
+    TableName: TABLE_NAME,
+    KeyConditionExpression: '#mod = :mode',
+    ExpressionAttributeNames: { 
+    '#mod': 'modelo', 
+    },
+    ExpressionAttributeValues: { 
+    ':mode': modelo
+    }
+  };
   try {
+    const validar = await db.query(p).promise();
 
-    if(modelo === undefined){
+    if(validar.Count !== 0 || validar.Count === undefined)
+
+    if(modelo === undefined || modelo === ''){
       return{statusCode: 500, body: `El modelo es requerido`};
     }
-    if(marca === undefined){
+    if(marca === undefined || marca === ''){
       return{statusCode: 500, body: `La marca es requerida`};
     }
     
   await db.put(params).promise();
-  return { statusCode: 201, body: 'Exito al crear item\n'+JSON.stringify(params.Item)};
+  return { statusCode: 201, body: `Exito al crear item ${validar.Count}\n`+JSON.stringify(params.Item)};
       
 
   } catch (error) {
