@@ -20,30 +20,14 @@ export const handler = async (event: any = {}): Promise<any> => {
     
   const {modelo, marca, ...resto } = JSON.parse(event.body);
 
-  item[PRIMARY_KEY] = uuidv4();
+  item['id'] = uuidv4();
   item['created_at'] = new Date().toString();
   const params = {
     TableName: TABLE_NAME,
     Item: item,
     ConditionExpression: 'attribute_not_exists(modelo)'
   };
-  const p = {
-    IndexName: PRIMARY_KEY,
-    TableName: TABLE_NAME,
-    KeyConditionExpression: '#mod = :mode',
-    ExpressionAttributeNames: { 
-    '#mod': 'modelo', 
-    },
-    ExpressionAttributeValues: { 
-    ':mode': modelo
-    }
-  };
   try {
-    const validar = await db.scan(p).promise();
-
-    if(validar.Count !== 0 || validar.Count !== undefined){
-      return{statusCode: 500, body: `El modelo ya existe`};
-    }
 
     if(modelo === undefined || modelo === ''){
       return{statusCode: 500, body: `El modelo es requerido`};
@@ -53,7 +37,7 @@ export const handler = async (event: any = {}): Promise<any> => {
     }
     
   await db.put(params).promise();
-  return { statusCode: 201, body: `Exito al crear item ${validar.Count}\n`+JSON.stringify(params.Item)};
+  return { statusCode: 201, body: `Exito al crear item\n`+JSON.stringify(params.Item)};
       
 
   } catch (error) {
