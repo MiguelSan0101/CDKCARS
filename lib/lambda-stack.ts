@@ -12,7 +12,7 @@ export class MyLambdaStack extends Stack {
     constructor(scope: Construct, id: string, stageName: string, props?: StackProps) {
       super(scope, id, props);
       const CarrosTable = new Table (this, 'carros', {
-        tableName:`carros - ${stageName}`,
+        tableName:`carros`,
         partitionKey:{
             name:'id',
             type: AttributeType.STRING
