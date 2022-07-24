@@ -12,7 +12,7 @@ export class MyLambdaStack extends Stack {
     constructor(scope: Construct, id: string, stageName: string, props?: StackProps) {
       super(scope, id, props);
       const CarrosTable = new Table (this, 'carros', {
-        tableName:`carros - ${stageName}`,
+        tableName:`carros`,
         partitionKey:{
             name:'id',
             type: AttributeType.STRING
@@ -34,40 +34,41 @@ export class MyLambdaStack extends Stack {
         depsLockFilePath: join(__dirname, '../', 'package-lock.json'),
         environment: {
           PRIMARY_KEY: 'id',
-          TABLE_NAME: CarrosTable.tableName
+          TABLE_NAME: CarrosTable.tableName,
+          "stageName": stageName
         },
         runtime: Runtime.NODEJS_14_X,
       }
     // Create a Lambda function for each of the CRUD operations
     const getOneLambda = new NodejsFunction(this, 'getOneItemFunction', {
       entry: join(__dirname, '../lambdas', 'get-one.ts'),
-      functionName:`getOneItemFunction - ${stageName}`,
+      functionName:`getOneItemFunction`,
       ...nodeJsFunctionProps,
     });
     const getAllLambda = new NodejsFunction(this, 'getAllItemsFunction', {
       entry: join(__dirname, '../lambdas', 'get-all.ts'),
-      functionName:`getAllItemsFunction - ${stageName}`,
+      functionName:`getAllItemsFunction`,
       ...nodeJsFunctionProps,
     });
     const createOneLambda = new NodejsFunction(this, 'createItemFunction', {
       entry: join(__dirname, '../lambdas', 'create.ts'),
-      functionName:`createItemFunction - ${stageName}`,
+      functionName:`createItemFunction`,
       ...nodeJsFunctionProps,
     });
     const updateOneLambda = new NodejsFunction(this, 'updateItemFunction', {
       entry: join(__dirname, '../lambdas', 'update-one.ts'),
-      functionName:`updateItemFunction - ${stageName}`,
+      functionName:`updateItemFunction`,
       ...nodeJsFunctionProps,
     });
     const deleteOneLambda = new NodejsFunction(this, 'deleteItemFunction', {
       entry: join(__dirname, '../lambdas', 'delete-one.ts'),
-      functionName:`deleteItemFunction - ${stageName}`,
+      functionName:`deleteItemFunction`,
       ...nodeJsFunctionProps,
     });
 
     const notificationsLambda = new NodejsFunction(this, 'notificationsFunction', {
       entry: join(__dirname, '../lambdas', 'notification.ts'),
-      functionName:`notificationsFunction - ${stageName}`,
+      functionName:`notificationsFunction`,
       ...nodeJsFunctionProps,
     });
 
@@ -105,7 +106,7 @@ export class MyLambdaStack extends Stack {
 
     // Create an API Gateway resource for each of the CRUD operations
     const api = new RestApi(this, 'itemsApi', {
-      restApiName: `Items Service - ${stageName}`,
+      restApiName: `Items Service`,
     });
 
     const items = api.root.addResource('items');
