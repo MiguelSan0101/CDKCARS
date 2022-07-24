@@ -34,8 +34,7 @@ export class MyLambdaStack extends Stack {
         depsLockFilePath: join(__dirname, '../', 'package-lock.json'),
         environment: {
           PRIMARY_KEY: 'itemId',
-          TABLE_NAME: CarrosTable.tableName,
-          "stageName": stageName
+          TABLE_NAME: CarrosTable.tableName
         },
         runtime: Runtime.NODEJS_14_X,
       }
