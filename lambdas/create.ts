@@ -41,7 +41,9 @@ export const handler = async (event: any = {}): Promise<any> => {
   try {
     const validar = await db.query(p).promise();
 
-    if(validar.Count !== 0 || validar.Count === undefined)
+    if(validar.Count !== 0 || validar.Count !== undefined){
+      return{statusCode: 500, body: `El modelo ya existe`};
+    }
 
     if(modelo === undefined || modelo === ''){
       return{statusCode: 500, body: `El modelo es requerido`};
