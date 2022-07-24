@@ -16,7 +16,8 @@ export const handler = async (event: any = {}): Promise<any> => {
     TableName: TABLE_NAME,
     Key: {
       [PRIMARY_KEY]: requestedItemId
-    }
+    },
+    IndexName: PRIMARY_KEY
   };
 
   try {
