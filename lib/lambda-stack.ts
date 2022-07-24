@@ -14,7 +14,7 @@ export class MyLambdaStack extends Stack {
       const CarrosTable = new Table (this, 'carros', {
         tableName:`carros`,
         partitionKey:{
-            name:'id',
+            name:'itemId',
             type: AttributeType.STRING
         },
         sortKey:{
@@ -33,7 +33,7 @@ export class MyLambdaStack extends Stack {
         },
         depsLockFilePath: join(__dirname, '../', 'package-lock.json'),
         environment: {
-          PRIMARY_KEY: 'id',
+          PRIMARY_KEY: 'itemId',
           TABLE_NAME: CarrosTable.tableName,
           "stageName": stageName
         },
