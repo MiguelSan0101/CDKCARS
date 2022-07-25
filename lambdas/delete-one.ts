@@ -4,6 +4,7 @@ const TABLE_NAME = process.env.TABLE_NAME || '';
 const PRIMARY_KEY = process.env.PRIMARY_KEY || '';
 
 const db = new AWS.DynamoDB.DocumentClient();
+const ddb = new AWS.DynamoDB();
 
 export const handler = async (event: any = {}): Promise<any> => {
 
@@ -12,16 +13,13 @@ export const handler = async (event: any = {}): Promise<any> => {
     return { statusCode: 400, body: `Error: You are missing the path parameter id` };
   }
 
-  const params = {
-    TableName: TABLE_NAME,
-    Key: {
-      id: requestedItemId
-    }
-  };
+  var marca = requestedItemId.split("/",2)
 
   try {
-    
-    await db.delete(params).promise();
+    const statement = `SELECT * FROM ${TABLE_NAME} WHERE marca = '${marca[0]}' and modelo = '${marca[1]}' `
+    const results = await ddb.executeStatement({Statement: statement}).promise();
+
+    //await db.delete(params).promise();
     return { statusCode: 200, body: 'Exito al eliminar item' };
   } catch (dbError) {
     return { statusCode: 500, body: JSON.stringify(dbError) };
