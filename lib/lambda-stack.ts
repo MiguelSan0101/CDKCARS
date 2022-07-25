@@ -125,6 +125,7 @@ export class MyLambdaStack extends Stack {
     addCorsOptions(mulItem);
 
     const modelos = api.root.addResource('modelo');
+    addCorsOptions(modelos);
     const singleItem = modelos.addResource('{modelo}');
     singleItem.addMethod('GET', getNewIntegration);
     singleItem.addMethod('PATCH', updateOneIntegration);
