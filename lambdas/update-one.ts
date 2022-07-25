@@ -10,12 +10,12 @@ const RESERVED_RESPONSE = `Error: You're using AWS reserved keywords as attribut
 const db = new AWS.DynamoDB.DocumentClient();
 
 export const handler = async (event: any = {}): Promise<any> => {
-  const {marca, ...resto } = JSON.parse(event.body);
+  const {year,...resto } = JSON.parse(event.body);
   if (!event.body) {
     return { statusCode: 400, body: 'solicitud no válida, falta el cuerpo del parámetro' };
   }
-  if (marca === undefined || marca === '') {
-    return { statusCode: 400, body: 'La marca es requerida' };
+  if (year === undefined || year === '') {
+    return { statusCode: 400, body: 'El año es requerida' };
   }
   const editedItemId = event.pathParameters.id;
   if (!editedItemId) {
@@ -47,9 +47,9 @@ export const handler = async (event: any = {}): Promise<any> => {
       modelo:m[1]  //Sort key 
     },
     UpdateExpression: 'set #a = :x',
-    ExpressionAttributeNames: {'#a' : 'marca'},
+    ExpressionAttributeNames: {'#a' : 'year'},
     ExpressionAttributeValues: {
-      ':x' : marca
+      ':x' : year
     }
   };
   try {
