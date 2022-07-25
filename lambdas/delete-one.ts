@@ -15,11 +15,12 @@ export const handler = async (event: any = {}): Promise<any> => {
   const params = {
     TableName: TABLE_NAME,
     Key: {
-      [PRIMARY_KEY]: requestedItemId
+      id: requestedItemId
     }
   };
 
   try {
+    
     await db.delete(params).promise();
     return { statusCode: 200, body: 'Exito al eliminar item' };
   } catch (dbError) {
