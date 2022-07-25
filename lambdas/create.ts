@@ -20,7 +20,7 @@ export const handler = async (event: any = {}): Promise<any> => {
     
   const {modelo, marca, ...resto } = JSON.parse(event.body);
 
-  item[PRIMARY_KEY] = uuidv4();
+  item['id'] = uuidv4();
   item['created_at'] = new Date().toString();
   const params = {
     TableName: TABLE_NAME,
