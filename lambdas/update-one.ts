@@ -28,18 +28,30 @@ export const handler = async (event: any = {}): Promise<any> => {
     return { statusCode: 400, body: 'solicitud inválida, no se proporcionaron argumentos' };
   }
   var m = editedItemId.split("_",2)
-  const params: any = {
+  // const params: any = {
+  //   TableName: TABLE_NAME,
+  //   Key: {
+  //     marca: m[0], //Primary key
+  //     modelo:m[1]  //Sort key
+  //   },
+  //   UpdateExpression: `set marca = :marca`,
+  //   ExpressionAttributeValues: {
+  //     ':marca':marca
+  //   },
+  //   ReturnValues: 'UPDATED_NEW'
+  // }
+  var params = {
     TableName: TABLE_NAME,
     Key: {
       marca: m[0], //Primary key
-      modelo:m[1]  //Sort key
+      modelo:m[1]  //Sort key 
     },
-    UpdateExpression: `set marca = :marca`,
+    UpdateExpression: 'set #a = :x',
+    ExpressionAttributeNames: {'#a' : 'marca'},
     ExpressionAttributeValues: {
-      ':marca':marca
-    },
-    ReturnValues: 'UPDATED_NEW'
-  }
+      ':x' : marca
+    }
+  };
   try {
     await db.update(params).promise();
     return { statusCode: 204, body: 'Actualizado Correctamente' };
