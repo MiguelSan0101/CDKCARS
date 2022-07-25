@@ -14,12 +14,8 @@ export class MyLambdaStack extends Stack {
       const CarrosTable = new Table (this, 'carros', {
         tableName:`carros`,
         partitionKey:{
-            name:'itemId',
+            name:'id',
             type: AttributeType.STRING
-        },
-        sortKey:{
-            name:'modelo',
-            type:AttributeType.STRING
         },
         stream: StreamViewType.NEW_AND_OLD_IMAGES,
         removalPolicy:RemovalPolicy.DESTROY
@@ -33,7 +29,7 @@ export class MyLambdaStack extends Stack {
         },
         depsLockFilePath: join(__dirname, '../', 'package-lock.json'),
         environment: {
-          PRIMARY_KEY: 'itemId',
+          PRIMARY_KEY: 'id',
           TABLE_NAME: CarrosTable.tableName
         },
         runtime: Runtime.NODEJS_14_X,
