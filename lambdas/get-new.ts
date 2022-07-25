@@ -6,7 +6,7 @@ const db = new AWS.DynamoDB.DocumentClient();
 
 export const handler = async (event: any = {}): Promise<any> => {
 
-  const requestedItemId = event.pathParameters.marca;
+  const requestedItemId = event.pathParameters.id;
   if (!requestedItemId) {
     return { statusCode: 400, body: `Error: You are missing the path parameter id` };
   }

@@ -120,13 +120,7 @@ export class MyLambdaStack extends Stack {
     items.addMethod('POST', createOneIntegration);
     addCorsOptions(items);
 
-    const mulItem = items.addResource('{marca}');
-    mulItem.addMethod('GET', getNewIntegration);
-    addCorsOptions(mulItem);
-
-    const modelos = api.root.addResource('modelo');
-    addCorsOptions(modelos);
-    const singleItem = modelos.addResource('{modelo}');
+    const singleItem = items.addResource('{id}');
     singleItem.addMethod('GET', getNewIntegration);
     singleItem.addMethod('PATCH', updateOneIntegration);
     singleItem.addMethod('DELETE', deleteOneIntegration);
