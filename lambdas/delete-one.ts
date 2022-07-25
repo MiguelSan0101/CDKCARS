@@ -23,10 +23,10 @@ export const handler = async (event: any = {}): Promise<any> => {
   }
 
   try {
-    // const statement = `SELECT * FROM ${TABLE_NAME} WHERE marca = '${marca[0]}' and modelo = '${marca[1]}' `
-    // const results = await ddb.executeStatement({Statement: statement}).promise();
+    const statement = `SELECT * FROM ${TABLE_NAME} WHERE marca = '${marca[0]}' and modelo = '${marca[1]}' `
+    const results = await ddb.executeStatement({Statement: statement}).promise();
 
-    await db.delete(params).promise();
+    //await db.delete(params).promise();
     return { statusCode: 200, body: 'Exito al eliminar item' };
   } catch (dbError) {
     return { statusCode: 500, body: JSON.stringify(dbError)+`M0: ${marca[0]} M1: ${marca[1]}` };
