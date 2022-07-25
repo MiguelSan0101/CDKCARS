@@ -11,8 +11,8 @@ import * as iam from "aws-cdk-lib/aws-iam";
 export class MyLambdaStack extends Stack {
     constructor(scope: Construct, id: string, stageName: string, props?: StackProps) {
       super(scope, id, props);
-      const CarrosTable = new Table (this, 'carros', {
-        tableName:`carros`,
+      const CarrosTable = new Table (this, `carros - ${stageName}`, {
+        tableName:`carros - ${stageName}`,
         partitionKey:{
             name:'modelo',
             type: AttributeType.STRING
@@ -37,33 +37,33 @@ export class MyLambdaStack extends Stack {
     // Create a Lambda function for each of the CRUD operations
     const getOneLambda = new NodejsFunction(this, 'getOneItemFunction', {
       entry: join(__dirname, '../lambdas', 'get-one.ts'),
-      functionName:`getOneItemFunction`,
+      functionName:`getOneItemFunction - ${stageName}`,
       ...nodeJsFunctionProps,
     });
     const getAllLambda = new NodejsFunction(this, 'getAllItemsFunction', {
       entry: join(__dirname, '../lambdas', 'get-all.ts'),
-      functionName:`getAllItemsFunction`,
+      functionName:`getAllItemsFunction - ${stageName}`,
       ...nodeJsFunctionProps,
     });
     const createOneLambda = new NodejsFunction(this, 'createItemFunction', {
       entry: join(__dirname, '../lambdas', 'create.ts'),
-      functionName:`createItemFunction`,
+      functionName:`createItemFunction - ${stageName}`,
       ...nodeJsFunctionProps,
     });
     const updateOneLambda = new NodejsFunction(this, 'updateItemFunction', {
       entry: join(__dirname, '../lambdas', 'update-one.ts'),
-      functionName:`updateItemFunction`,
+      functionName:`updateItemFunction - ${stageName}`,
       ...nodeJsFunctionProps,
     });
     const deleteOneLambda = new NodejsFunction(this, 'deleteItemFunction', {
       entry: join(__dirname, '../lambdas', 'delete-one.ts'),
-      functionName:`deleteItemFunction`,
+      functionName:`deleteItemFunction - ${stageName}`,
       ...nodeJsFunctionProps,
     });
 
     const notificationsLambda = new NodejsFunction(this, 'notificationsFunction', {
       entry: join(__dirname, '../lambdas', 'notification.ts'),
-      functionName:`notificationsFunction`,
+      functionName:`notificationsFunction - ${stageName}`,
       ...nodeJsFunctionProps,
     });
 
@@ -100,8 +100,8 @@ export class MyLambdaStack extends Stack {
 
 
     // Create an API Gateway resource for each of the CRUD operations
-    const api = new RestApi(this, 'itemsApi', {
-      restApiName: `Items Service`,
+    const api = new RestApi(this, 'itemsApi - ${stageName}', {
+      restApiName: `Items Service - ${stageName}`,
     });
 
     const items = api.root.addResource('items');
