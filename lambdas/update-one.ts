@@ -40,13 +40,10 @@ export const handler = async (event: any = {}): Promise<any> => {
     },
     ReturnValues: 'UPDATED_NEW'
   }
-
   try {
     await db.update(params).promise();
     return { statusCode: 204, body: 'Actualizado Correctamente' };
   } catch (dbError) {
-    const errorResponse = dbError === 'ValidationException' && dbError.includes('reserved keyword') ?
-      DYNAMODB_EXECUTION_ERROR : RESERVED_RESPONSE;
-    return { statusCode: 500, body: errorResponse +`M0: ${m[0]} M1: ${m[1]}` };
+    return { statusCode: 500, body: dbError +`M0: ${m[0]} M1: ${m[1]}` };
   }
 };
