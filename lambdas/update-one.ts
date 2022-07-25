@@ -34,8 +34,10 @@ export const handler = async (event: any = {}): Promise<any> => {
       marca: m[0], //Primary key
       modelo:m[1]  //Sort key
     },
-    UpdateExpression: `set marca = :${marca}`,
-    ExpressionAttributeValues: {},
+    UpdateExpression: `set marca = :marca`,
+    ExpressionAttributeValues: {
+      ':marca':marca
+    },
     ReturnValues: 'UPDATED_NEW'
   }
 
@@ -45,6 +47,6 @@ export const handler = async (event: any = {}): Promise<any> => {
   } catch (dbError) {
     const errorResponse = dbError === 'ValidationException' && dbError.includes('reserved keyword') ?
       DYNAMODB_EXECUTION_ERROR : RESERVED_RESPONSE;
-    return { statusCode: 500, body: errorResponse +`M0: ${marca[0]} M1: ${marca[1]}` };
+    return { statusCode: 500, body: errorResponse +`M0: ${m[0]} M1: ${m[1]}` };
   }
 };
