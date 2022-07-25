@@ -17,8 +17,8 @@ export const handler = async (event: any = {}): Promise<any> => {
   const params = {
     TableName: TABLE_NAME,
     Key: {
-      marca: marca[0],
-      modelo:marca[1]
+      marca: marca[0], //Primary key
+      modelo:marca[1]  //Sort key
     }
   }
 

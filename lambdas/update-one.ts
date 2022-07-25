@@ -27,12 +27,13 @@ export const handler = async (event: any = {}): Promise<any> => {
   if (!editedItem || editedItemProperties.length < 1) {
     return { statusCode: 400, body: 'solicitud inválida, no se proporcionaron argumentos' };
   }
-
+  var m = editedItemId.split("_",2)
   const firstProperty = editedItemProperties.splice(0, 1);
   const params: any = {
     TableName: TABLE_NAME,
     Key: {
-      [PRIMARY_KEY]: editedItemId
+      marca: m[0], //Primary key
+      modelo:m[1]  //Sort key
     },
     UpdateExpression: `set ${firstProperty} = :${firstProperty}`,
     ExpressionAttributeValues: {},
