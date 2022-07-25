@@ -11,7 +11,7 @@ export const handler = async (): Promise<any> => {
   };
 
   try {
-    const response = await db.scan(params).promise(); // Scan es mas tardado, mejor usar query
+    const response = await db.query(params).promise(); // Scan es mas tardado, mejor usar query
     return { statusCode: 200, body: JSON.stringify(response.Items) };
   } catch (dbError) {
     return { statusCode: 500, body: JSON.stringify(dbError) };

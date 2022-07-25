@@ -14,8 +14,12 @@ export class MyLambdaStack extends Stack {
       const CarrosTable = new Table (this, `carros-${stageName}`, {
         tableName:`carros-${stageName}`,
         partitionKey:{
-            name:'modelo',
+            name:'marca',
             type: AttributeType.STRING
+        },
+        sortKey:{
+          name:'modelo',
+          type: AttributeType.STRING
         },
         stream: StreamViewType.NEW_AND_OLD_IMAGES,
         removalPolicy:RemovalPolicy.DESTROY
@@ -66,6 +70,11 @@ export class MyLambdaStack extends Stack {
       functionName:`notificationsFunction-${stageName}`,
       ...nodeJsFunctionProps,
     });
+    const getNewLambda = new NodejsFunction(this, 'getNewFunction', {
+      entry: join(__dirname, '../lambdas', 'get-new.ts'),
+      functionName:`getNewFunction-${stageName}`,
+      ...nodeJsFunctionProps,
+    });
 
 
     // Grant the Lambda function read access to the DynamoDB table
@@ -74,6 +83,7 @@ export class MyLambdaStack extends Stack {
     CarrosTable.grantReadWriteData(createOneLambda);
     CarrosTable.grantReadWriteData(updateOneLambda);
     CarrosTable.grantReadWriteData(deleteOneLambda);
+    CarrosTable.grantReadWriteData(getNewLambda);
 
     notificationsLambda.addEventSource(new DynamoEventSource(CarrosTable, {
       startingPosition:StartingPosition.TRIM_HORIZON,
@@ -97,6 +107,7 @@ export class MyLambdaStack extends Stack {
     const getOneIntegration = new LambdaIntegration(getOneLambda);
     const updateOneIntegration = new LambdaIntegration(updateOneLambda);
     const deleteOneIntegration = new LambdaIntegration(deleteOneLambda);
+    const getNewIntegration = new LambdaIntegration(getNewLambda);
 
 
     // Create an API Gateway resource for each of the CRUD operations
@@ -110,7 +121,7 @@ export class MyLambdaStack extends Stack {
     addCorsOptions(items);
 
     const singleItem = items.addResource('{id}');
-    singleItem.addMethod('GET', getOneIntegration);
+    singleItem.addMethod('GET', getNewIntegration);
     singleItem.addMethod('PATCH', updateOneIntegration);
     singleItem.addMethod('DELETE', deleteOneIntegration);
     addCorsOptions(singleItem);

@@ -25,9 +25,9 @@ export class CdkcarsStack extends Stack {
       // testingStage.addPre(new ShellStep("Run Unit Tests", { commands: ['npm install', 'npm test'] }));
       // testingStage.addPost(new ManualApprovalStep('Manual approval before production'));
   
-      const prodStage = pipeline.addStage(new MyPipelineAppStage(this, "prod", {
-        env: { account: "591039258532", region: "us-east-2" }
-      }));
+      // const prodStage = pipeline.addStage(new MyPipelineAppStage(this, "prod", {
+      //   env: { account: "591039258532", region: "us-east-2" }
+      // }));
 
   }
 }
