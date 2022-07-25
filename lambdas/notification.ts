@@ -1,6 +1,6 @@
 import * as nodemailer from 'nodemailer';
 
-
+var MENSAJE = process.env.MENSAJE || '';
 export const handler = async (event: any = {}): Promise<any> => {
 console.log('Estamos en notificaciones')
    
@@ -18,7 +18,7 @@ var transport = nodemailer.createTransport({
         from:'miguel.sanchez@happyguest.mx',
         to:'vito.corleone.hg@yopmail.com',
         subject:'Item Insertado',
-        text:`Se ha insertado, modificado o eliminado un item`
+        text:`${MENSAJE}`
       })
       console.log('Envie el mensaje')
 

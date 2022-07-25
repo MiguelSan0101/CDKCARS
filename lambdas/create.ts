@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 
 const TABLE_NAME = process.env.TABLE_NAME || '';
-const PRIMARY_KEY = process.env.PRIMARY_KEY || '';
+var MENSAJE = process.env.MENSAJE || '';
 
 const db = new AWS.DynamoDB.DocumentClient();
 
@@ -38,6 +38,7 @@ export const handler = async (event: any = {}): Promise<any> => {
     }
     
   await db.put(params).promise();
+  MENSAJE = `Exito al crear item \n`+JSON.stringify(params.Item)
   return { statusCode: 201, body: `Exito al crear item \n`+JSON.stringify(params.Item)};
       
 

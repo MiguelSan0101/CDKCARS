@@ -2,6 +2,7 @@ import * as AWS from 'aws-sdk';
 
 const TABLE_NAME = process.env.TABLE_NAME || '';
 const PRIMARY_KEY = process.env.PRIMARY_KEY || '';
+var MENSAJE = process.env.MENSAJE || '';
 
 const db = new AWS.DynamoDB.DocumentClient();
 
@@ -21,6 +22,7 @@ export const handler = async (event: any = {}): Promise<any> => {
 
   try {
     await db.delete(params).promise();
+    MENSAJE = 'Se ha eliminado un item'
     return { statusCode: 200, body: 'Exito al eliminar item' };
   } catch (dbError) {
     return { statusCode: 500, body: JSON.stringify(dbError) };
