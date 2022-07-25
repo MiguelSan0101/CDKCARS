@@ -7,22 +7,23 @@ const db = new AWS.DynamoDB.DocumentClient();
 
 export const handler = async (event: any = {}): Promise<any> => {
 
-  const requestedItemId = event.pathParameters.id;
-  if (!requestedItemId) {
+  const requestedItemModelo = event.pathParameters.modelo;
+  if (!requestedItemModelo) {
     return { statusCode: 400, body: `Error: You are missing the path parameter id` };
   }
 
   const params = {
     TableName: TABLE_NAME,
-    Key: {
-      [PRIMARY_KEY]: requestedItemId
+    KeyConditionExpression: "modelo = :mod",
+    ExpressionAttributeValues: {
+        ":mod": requestedItemModelo
     }
   };
 
   try {
-    const response = await db.get(params).promise();
-    if (response.Item) {
-      return { statusCode: 200, body: JSON.stringify(response.Item) };
+    const response = await db.query(params).promise();
+    if (response.Items) {
+      return { statusCode: 200, body: JSON.stringify(response.Items) };
     } else {
       return { statusCode: 404 };
     }
