@@ -39,12 +39,6 @@ export const handler = async (event: any = {}): Promise<any> => {
     ExpressionAttributeValues: {},
     ReturnValues: 'UPDATED_NEW'
   }
-  params.ExpressionAttributeValues[`:${firstProperty}`] = editedItem[`${firstProperty}`];
-
-  editedItemProperties.forEach(property => {
-    params.UpdateExpression += `, ${property} = :${property}`;
-    params.ExpressionAttributeValues[`:${property}`] = editedItem[property];
-  });
 
   try {
     await db.update(params).promise();
