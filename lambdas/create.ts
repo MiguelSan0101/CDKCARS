@@ -70,6 +70,6 @@ export const handler = async (event: any = {}): Promise<any> => {
   } catch (error) {
     const errorResponse = error === 'ValidationException' && error.includes('reserved keyword') ?
       DYNAMODB_EXECUTION_ERROR : RESERVED_RESPONSE;
-    return { statusCode: 500, body: errorResponse + `\nEl modelo ya existe`  };
+    return { statusCode: 500, body: error + `\nEl modelo ya existe`  };
   }
 };
