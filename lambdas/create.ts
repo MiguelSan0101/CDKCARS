@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 const parser = require('lambda-multipart-parser');
 // import * as nodemailer from 'nodemailer';
 import { PutObjectRequest } from 'aws-sdk/clients/s3';
+const fs = require('fs'); 
 
 
 const TABLE_NAME = process.env.TABLE_NAME || '';
@@ -42,12 +43,11 @@ export const handler = async (event: any = {}): Promise<any> => {
   }
 
   try {
-    let encodedImage = JSON.parse(content).base64Data;
-    let decodedImage = Buffer.from(encodedImage, 'base64');
+    const imgdata = fs.readFileSync(content)
     const paramsImg: PutObjectRequest =  {
       Bucket: 'imagenesmiguel',
       Key: filename,
-      Body: decodedImage,
+      Body: imgdata,
       ACL: 'public-read',
       ContentType: contentType
     }
