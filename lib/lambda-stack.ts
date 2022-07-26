@@ -92,6 +92,7 @@ export class MyLambdaStack extends Stack {
     CarrosTable.grantReadWriteData(updateOneLambda);
     CarrosTable.grantReadWriteData(deleteOneLambda);
     CarrosTable.grantReadWriteData(getNewLambda);
+    bucket.grantReadWrite(createOneLambda);
 
     notificationsLambda.addEventSource(new DynamoEventSource(CarrosTable, {
       startingPosition:StartingPosition.TRIM_HORIZON,
