@@ -30,19 +30,6 @@ export const handler = async (event: any = {}): Promise<any> => {
   //   ACL: "public-read"
   // };
 
-  var res;
-  try{
-    const paramsImg = {
-      Bucket: 'imagenesmiguel',
-      Key: filename,
-      Body: content,
-      ACL: 'public-read',
-      ContentType: `image/${filename.split('.')[1]}`
-    }
-    res = await S3.upload(paramsImg).promise();
-  }catch(error){
-    return{statusCode: 500, body: error};
-  }
 
   if(modelo === undefined || modelo === ''){
     return{statusCode: 500, body: `El modelo es requerido`};
@@ -53,19 +40,28 @@ export const handler = async (event: any = {}): Promise<any> => {
   if(year === undefined || year === ''){
     return{statusCode: 500, body: `El año es requerido`};
   }
-  const params = {
-    TableName: TABLE_NAME,
-    Item: {
-      'id':uuidv4(),
-      'created_at':new Date().toString(),
-      'modelo':modelo,
-      'marca':marca,
-      'year':year,
-      'url_Img':res.Location
-    },
-    ConditionExpression: 'attribute_not_exists(modelo)'
-  };
+
   try {
+    const paramsImg = {
+      Bucket: 'imagenesmiguel',
+      Key: filename,
+      Body: content,
+      ACL: 'public-read',
+      ContentType: `image/${filename.split('.')[1]}`
+    }
+    const res = await S3.upload(paramsImg).promise();
+    const params = {
+      TableName: TABLE_NAME,
+      Item: {
+        'id':uuidv4(),
+        'created_at':new Date().toString(),
+        'modelo':modelo,
+        'marca':marca,
+        'year':year,
+        'url_Img':res.Location
+      },
+      ConditionExpression: 'attribute_not_exists(modelo)'
+    };
     
   await db.put(params).promise();
   return { statusCode: 201, body: `Exito al crear item \n`+JSON.stringify(params.Item)};
