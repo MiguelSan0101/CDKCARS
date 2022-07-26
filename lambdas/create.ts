@@ -21,7 +21,7 @@ export const handler = async (event: any = {}): Promise<any> => {
   const { content, filename, contentType } = result.files[0];
 
   const paramsImg = {
-    Bucket: "imagenes_Miguel",
+    Bucket: "imagenesMiguel",
     Key: filename,
     Body: content,
     ContentDisposition: `attachment; filename="${filename}";`,

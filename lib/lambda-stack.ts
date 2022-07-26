@@ -26,9 +26,9 @@ export class MyLambdaStack extends Stack {
         removalPolicy:RemovalPolicy.DESTROY
       })
 
-      const bucket = new S3.Bucket(this, `imagenes_Miguel`, {
+      const bucket = new S3.Bucket(this, `imagenesMiguel`, {
         publicReadAccess:true,
-        bucketName:`imagenes_Miguel`,
+        bucketName:`imagenesMiguel`,
         removalPolicy:RemovalPolicy.DESTROY
 
       })
