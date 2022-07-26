@@ -8,6 +8,7 @@ import { Construct } from 'constructs';
 import { DynamoEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as S3  from 'aws-cdk-lib/aws-s3';
+import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 
 export class MyLambdaStack extends Stack {
     constructor(scope: Construct, id: string, stageName: string, props?: StackProps) {
@@ -31,6 +32,11 @@ export class MyLambdaStack extends Stack {
         bucketName:`imagenesmiguel`,
         removalPolicy:RemovalPolicy.DESTROY
 
+      })
+      const writePolicy = new PolicyStatement({
+        effect: Effect.ALLOW,
+        actions:['s3:PutObject', 's3:PutObjectAcl'],
+        resources:[bucket.bucketArn + '/*']
       })
 
       const nodeJsFunctionProps: NodejsFunctionProps = {
@@ -84,6 +90,7 @@ export class MyLambdaStack extends Stack {
       ...nodeJsFunctionProps,
     });
 
+    createOneLambda.addToRolePolicy(writePolicy);
 
     // Grant the Lambda function read access to the DynamoDB table
     CarrosTable.grantReadWriteData(getAllLambda);
@@ -92,7 +99,6 @@ export class MyLambdaStack extends Stack {
     CarrosTable.grantReadWriteData(updateOneLambda);
     CarrosTable.grantReadWriteData(deleteOneLambda);
     CarrosTable.grantReadWriteData(getNewLambda);
-    bucket.grantReadWrite(createOneLambda);
 
     notificationsLambda.addEventSource(new DynamoEventSource(CarrosTable, {
       startingPosition:StartingPosition.TRIM_HORIZON,
