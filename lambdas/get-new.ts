@@ -25,8 +25,7 @@ var bandera = true;
     KeyConditionExpression: "marca = :m",
     ExpressionAttributeValues: {
         ":m": requestedItemId
-    },
-    ScanIndexForward:bandera
+    }
   };
 
   try {
