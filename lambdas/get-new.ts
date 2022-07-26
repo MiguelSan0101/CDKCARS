@@ -6,6 +6,15 @@ const db = new AWS.DynamoDB.DocumentClient();
 
 export const handler = async (event: any = {}): Promise<any> => {
 
+ const {order} = event.queryStringParameters();
+var bandera = true;
+ if(order === 'ase'){
+    bandera=true
+ }
+ if(order === 'des'){
+    bandera=false
+ }
+
   const requestedItemId = event.pathParameters.id;
   if (!requestedItemId) {
     return { statusCode: 400, body: `Error: You are missing the path parameter id` };
@@ -16,7 +25,8 @@ export const handler = async (event: any = {}): Promise<any> => {
     KeyConditionExpression: "marca = :m",
     ExpressionAttributeValues: {
         ":m": requestedItemId
-    }
+    },
+    ScanIndexForward:bandera
   };
 
   try {

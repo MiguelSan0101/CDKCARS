@@ -12,30 +12,28 @@ const RESERVED_RESPONSE = `Error: You're using AWS reserved keywords as attribut
   DYNAMODB_EXECUTION_ERROR = `Error: Execution update, caused a Dynamodb error, please take a look at your CloudWatch Logs.`;
 
 export const handler = async (event: any = {}): Promise<any> => {
-
-  if (!event.body) {
-    return { statusCode: 400, body: 'invalid request, you are missing the parameter body' };
+  const {modelo, marca, year, ...resto } = event.queryStringParameters();
+  if(modelo === undefined || modelo === ''){
+    return{statusCode: 500, body: `El modelo es requerido`};
   }
-  const item = typeof event.body == 'object' ? event.body : JSON.parse(event.body);
-    
-  const {modelo, marca, ...resto } = JSON.parse(event.body);
-
-  item['id'] = uuidv4();
-  item['created_at'] = new Date().toString();
+  if(marca === undefined || marca === ''){
+    return{statusCode: 500, body: `La marca es requerida`};
+  }
+  if(year === undefined || year === ''){
+    return{statusCode: 500, body: `El año es requerido`};
+  }
   const params = {
     TableName: TABLE_NAME,
-    Item: item,
+    Item: {
+      'id':uuidv4(),
+      'created_at':new Date().toString(),
+      'modelo':modelo,
+      'marca':marca,
+      'year':year
+    },
     ConditionExpression: 'attribute_not_exists(modelo)'
   };
   try {
-
-
-    if(modelo === undefined || modelo === ''){
-      return{statusCode: 500, body: `El modelo es requerido`};
-    }
-    if(marca === undefined || marca === ''){
-      return{statusCode: 500, body: `La marca es requerida`};
-    }
     
   await db.put(params).promise();
   return { statusCode: 201, body: `Exito al crear item \n`+JSON.stringify(params.Item)};
