@@ -43,11 +43,10 @@ export const handler = async (event: any = {}): Promise<any> => {
   }
 
   try {
-    const imgdata = fs.readFileSync(content)
     const paramsImg: PutObjectRequest =  {
       Bucket: 'imagenesmiguel',
       Key: filename,
-      Body: imgdata,
+      Body: content,
       ACL: 'public-read',
       ContentType: contentType
     }

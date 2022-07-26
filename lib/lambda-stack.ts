@@ -128,6 +128,7 @@ export class MyLambdaStack extends Stack {
     // Create an API Gateway resource for each of the CRUD operations
     const api = new RestApi(this, 'itemsApi - ${stageName}', {
       restApiName: `Items Service-${stageName}`,
+      binaryMediaTypes:['multipart/form-data']
     });
 
     const items = api.root.addResource('items');
