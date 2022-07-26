@@ -6,7 +6,7 @@ const db = new AWS.DynamoDB.DocumentClient();
 
 export const handler = async (event: any = {}): Promise<any> => {
 
- const {order} = event.queryStringParameters();
+ const order = event.queryStringParameters.order;
 var bandera = true;
  if(order === 'ase'){
     bandera=true
@@ -25,7 +25,8 @@ var bandera = true;
     KeyConditionExpression: "marca = :m",
     ExpressionAttributeValues: {
         ":m": requestedItemId
-    }
+    },
+    ScanIndexForward:bandera
   };
 
   try {
