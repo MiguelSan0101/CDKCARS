@@ -29,15 +29,16 @@ export const handler = async (event: any = {}): Promise<any> => {
   //   ContentType: contentType,
   //   ACL: "public-read"
   // };
-  const paramsImg: PutObjectRequest = {
-    Bucket: 'imagenesmiguel',
-    Key: filename,
-    Body: content,
-    ACL: 'public-read',
-    ContentType: `image/${filename.split('.')[1]}`
-  }
-  var res
+
+  var res;
   try{
+    const paramsImg = {
+      Bucket: 'imagenesmiguel',
+      Key: filename,
+      Body: content,
+      ACL: 'public-read',
+      ContentType: `image/${filename.split('.')[1]}`
+    }
     res = await S3.upload(paramsImg).promise();
   }catch(error){
     return{statusCode: 500, body: error};
