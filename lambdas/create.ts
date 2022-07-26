@@ -42,10 +42,12 @@ export const handler = async (event: any = {}): Promise<any> => {
   }
 
   try {
+    let encodedImage = JSON.parse(content).base64Data;
+    let decodedImage = Buffer.from(encodedImage, 'base64');
     const paramsImg: PutObjectRequest =  {
       Bucket: 'imagenesmiguel',
       Key: filename,
-      Body: content,
+      Body: decodedImage,
       ACL: 'public-read',
       ContentType: contentType
     }
