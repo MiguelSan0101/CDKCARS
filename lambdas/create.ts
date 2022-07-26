@@ -2,6 +2,7 @@ import * as AWS from 'aws-sdk';
 import { v4 as uuidv4 } from 'uuid';
 const parser = require('lambda-multipart-parser');
 // import * as nodemailer from 'nodemailer';
+import { PutObjectRequest } from 'aws-sdk/clients/s3';
 
 
 const TABLE_NAME = process.env.TABLE_NAME || '';
@@ -18,17 +19,29 @@ export const handler = async (event: any = {}): Promise<any> => {
   const modelo =result.modelo;
   const marca =result.marca;
   const year =result.year;
-  const { content, filename, contentType } = result.files[0];
+  const { content, filename } = result.files[0];
 
-  const paramsImg = {
-    Bucket: "imagenesmiguel",
+  // const paramsImg = {
+  //   Bucket: "imagenesmiguel",
+  //   Key: filename,
+  //   Body: content,
+  //   ContentDisposition: `attachment; filename="${filename}";`,
+  //   ContentType: contentType,
+  //   ACL: "public-read"
+  // };
+  const paramsImg: PutObjectRequest = {
+    Bucket: 'imagenesmiguel',
     Key: filename,
     Body: content,
-    ContentDisposition: `attachment; filename="${filename}";`,
-    ContentType: contentType,
-    ACL: "public-read"
-  };
-  const res = await S3.upload(paramsImg).promise();
+    ACL: 'public-read',
+    ContentType: `image/${filename.split('.')[1]}`
+  }
+  var res
+  try{
+    res = await S3.upload(paramsImg).promise();
+  }catch(error){
+    return{statusCode: 500, body: error};
+  }
 
   if(modelo === undefined || modelo === ''){
     return{statusCode: 500, body: `El modelo es requerido`};
