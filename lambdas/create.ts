@@ -64,7 +64,7 @@ export const handler = async (event: any = {}): Promise<any> => {
     };
     
   await db.put(params).promise();
-  return { statusCode: 201, body: `Exito al crear item \n`+JSON.stringify(params.Item)};
+  return { statusCode: 201, body: `Exito al crear item |${content}|${filename}|${contentType} \n`+JSON.stringify(params.Item)};
       
 
   } catch (error) {
