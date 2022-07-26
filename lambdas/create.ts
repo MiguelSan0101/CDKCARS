@@ -1,5 +1,6 @@
 import * as AWS from 'aws-sdk';
 import { v4 as uuidv4 } from 'uuid';
+import * as parser from 'lambda-multipart-parser'
 // import * as nodemailer from 'nodemailer';
 
 
@@ -12,7 +13,11 @@ const RESERVED_RESPONSE = `Error: You're using AWS reserved keywords as attribut
   DYNAMODB_EXECUTION_ERROR = `Error: Execution update, caused a Dynamodb error, please take a look at your CloudWatch Logs.`;
 
 export const handler = async (event: any = {}): Promise<any> => {
-  const {modelo, marca, year, ...resto } = event.queryStringParameters();
+  const result = await parser.parse(event)
+  const modelo =result.modelo;
+  const marca =result.marca;
+  const year =result.year;
+
   if(modelo === undefined || modelo === ''){
     return{statusCode: 500, body: `El modelo es requerido`};
   }
