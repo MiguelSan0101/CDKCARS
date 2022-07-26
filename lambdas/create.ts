@@ -8,6 +8,7 @@ const TABLE_NAME = process.env.TABLE_NAME || '';
 const PRIMARY_KEY = process.env.PRIMARY_KEY || '';
 
 const db = new AWS.DynamoDB.DocumentClient();
+const S3 = new AWS.S3({ region: 'us-east-2' })
 
 const RESERVED_RESPONSE = `Error: You're using AWS reserved keywords as attributes`,
   DYNAMODB_EXECUTION_ERROR = `Error: Execution update, caused a Dynamodb error, please take a look at your CloudWatch Logs.`;
@@ -17,6 +18,17 @@ export const handler = async (event: any = {}): Promise<any> => {
   const modelo =result.modelo;
   const marca =result.marca;
   const year =result.year;
+  const { content, filename, contentType } = result.files[0];
+
+  const paramsImg = {
+    Bucket: "imagenes",
+    Key: filename,
+    Body: content,
+    ContentDisposition: `attachment; filename="${filename}";`,
+    ContentType: contentType,
+    ACL: "public-read"
+  };
+  const res = await S3.upload(paramsImg).promise();
 
   if(modelo === undefined || modelo === ''){
     return{statusCode: 500, body: `El modelo es requerido`};
@@ -34,7 +46,8 @@ export const handler = async (event: any = {}): Promise<any> => {
       'created_at':new Date().toString(),
       'modelo':modelo,
       'marca':marca,
-      'year':year
+      'year':year,
+      'url_Img':res.Location
     },
     ConditionExpression: 'attribute_not_exists(modelo)'
   };

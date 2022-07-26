@@ -7,6 +7,7 @@ import { join } from 'path'
 import { Construct } from 'constructs';
 import { DynamoEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 import * as iam from "aws-cdk-lib/aws-iam";
+import * as S3  from 'aws-cdk-lib/aws-s3';
 
 export class MyLambdaStack extends Stack {
     constructor(scope: Construct, id: string, stageName: string, props?: StackProps) {
@@ -23,6 +24,13 @@ export class MyLambdaStack extends Stack {
         },
         stream: StreamViewType.NEW_AND_OLD_IMAGES,
         removalPolicy:RemovalPolicy.DESTROY
+      })
+
+      const bucket = new S3.Bucket(this, `imagenes`, {
+        publicReadAccess:true,
+        bucketName:`imagenes`,
+        removalPolicy:RemovalPolicy.DESTROY
+
       })
 
       const nodeJsFunctionProps: NodejsFunctionProps = {

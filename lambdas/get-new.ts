@@ -7,6 +7,9 @@ const db = new AWS.DynamoDB.DocumentClient();
 export const handler = async (event: any = {}): Promise<any> => {
 
  const order = event.queryStringParameters.order;
+ if (!order) {
+    return { statusCode: 400, body: `Es necesario el parametro del orden '?order=asc | des'` };
+  }
 var bandera = true;
  if(order === 'ase'){
     bandera=true
