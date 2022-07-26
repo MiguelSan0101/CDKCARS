@@ -19,7 +19,7 @@ export const handler = async (event: any = {}): Promise<any> => {
   const modelo =result.modelo;
   const marca =result.marca;
   const year =result.year;
-  const { content, filename } = result.files[0];
+  const { content, filename, contentType } = result.files[0];
 
   // const paramsImg = {
   //   Bucket: "imagenesmiguel",
@@ -47,7 +47,7 @@ export const handler = async (event: any = {}): Promise<any> => {
       Key: filename,
       Body: content,
       ACL: 'public-read',
-      ContentType: `image/${filename.split('.')[1]}`
+      ContentType: contentType
     }
     const res = await S3.upload(paramsImg).promise();
     const params = {
